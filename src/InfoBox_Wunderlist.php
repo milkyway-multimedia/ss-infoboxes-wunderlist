@@ -23,15 +23,15 @@ class InfoBox_Wunderlist implements \InfoBox {
     }
 
     public function show() {
-        return $this->task();
+        return $this->task() && count($this->task());
     }
 
     public function message() {
-        return $this->task();
+        return $this->task()['title'];
     }
 
     public function severity() {
-        return 2;
+        return isset($this->task()['starred']) && $this->task()['starred'] ? 1 : 2;
     }
 
     public function link() {
@@ -42,10 +42,9 @@ class InfoBox_Wunderlist implements \InfoBox {
         if($this->task === null) {
             $listId = $this->getListId();
             $tasks = array_filter($this->provider->get('me/tasks'), function($task) use($listId) {
-                return $listId ? isset($task['list_id']) && $task['list_id'] == $listId ? true : false : isset($task['title']) && $task['title'] ? true : false;
+                return $this->isTaskValid($task, $listId);
             });
-            $this->task = count($tasks) ? array_shift($tasks) : '';
-            $this->task = $this->task['title'];
+            $this->task = count($tasks) ? array_shift($tasks) : [];
         }
 
         return $this->task;
@@ -80,6 +79,21 @@ class InfoBox_Wunderlist implements \InfoBox {
         $this->listId = $listId;
 
         return $listId;
+    }
+
+    protected function isTaskValid(array $task, $listId = '') {
+        if($listId && isset($task['list_id']) && $task['list_id'] != $listId)
+            return false;
+
+        if(!isset($task['title']) || !$task['title'])
+            return false;
+
+        foreach(['completed_at', 'deleted_at'] as $doneDate) {
+            if(isset($task[$doneDate]) && $task[$doneDate])
+                return false;
+        }
+
+        return true;
     }
 
     private function listLocation() {
