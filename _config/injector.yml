@@ -1,0 +1,8 @@
+---
+Name: infoboxes-wunderlist--injector
+---
+Injector:
+
+  'Milkyway\SS\InfoBoxes\Wunderlist\InfoBox_Wunderlist':
+    constructor:
+      0: '%$Milkyway\SS\InfoBoxes\Wunderlist\Provider'

@@ -1,0 +1,15 @@
+{
+	"name": "milkyway-multimedia/ss-infoboxes-wunderlist",
+	"description": "CMS Info boxes to connect to Wunderlist API",
+    "type"        : "silverstripe-module",
+    "keywords"    : ["silverstripe", "Wunderlist", "conditional", "info", "boxes", "cms"],
+    "license"     : "MIT",
+    "require"     : {
+        "silverstripe/framework"     : "~3.1",
+        "milkyway-multimedia/ss-mwm" : "dev-master",
+        "guzzlehttp/guzzle"          : "~4"
+    },
+    "extra"       : {
+        "installer-name" : "infoboxes-wunderlist"
+    }
+}
