@@ -40,11 +40,16 @@ class InfoBox_Wunderlist implements \InfoBox {
 
     protected function task() {
         if($this->task === null) {
-            $listId = $this->getListId();
-            $tasks = array_filter($this->provider->get('me/tasks'), function($task) use($listId) {
-                return $this->isTaskValid($task, $listId);
-            });
-            $this->task = count($tasks) ? array_shift($tasks) : [];
+            try {
+                $listId = $this->getListId();
+                $tasks = array_filter($this->provider->get('me/tasks'), function($task) use($listId) {
+                    return $this->isTaskValid($task, $listId);
+                });
+
+                $this->task = count($tasks) ? array_shift($tasks) : [];
+            } catch (Exception $e) {
+                $this->task = [];
+            }
         }
 
         return $this->task;
