@@ -8,7 +8,7 @@
  * @author Mellisa Hankins <mell@milkywaymultimedia.com.au>
  */
 
-use Milkyway\SS\InfoBoxes\Wunderlist\Contracts\Provider;
+use Milkyway\SS\InfoBoxes\Wunderlist\Contracts\Provider as ProviderContract;
 use Milkyway\SS\Config;
 use Exception;
 
@@ -17,7 +17,7 @@ class InfoBox_Wunderlist implements \InfoBox {
     protected $listId;
     protected $task;
 
-    public function __construct(Provider $provider, $listId = '') {
+    public function __construct(ProviderContract $provider, $listId = '') {
         $this->provider = $provider;
         $this->listId = $listId;
     }
