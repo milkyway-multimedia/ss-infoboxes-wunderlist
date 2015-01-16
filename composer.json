@@ -5,7 +5,7 @@
     "keywords"    : ["silverstripe", "Wunderlist", "conditional", "info", "boxes", "cms"],
     "license"     : "MIT",
     "require"     : {
-        "silverstripe/framework"     : "~3.1",
+        "stnvh/silverstripe-infoboxes"     : "~1",
         "milkyway-multimedia/ss-mwm" : "dev-master",
         "guzzlehttp/guzzle"          : "~4"
     },
