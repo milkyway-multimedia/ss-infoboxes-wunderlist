@@ -9,8 +9,7 @@
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Message\ResponseInterface;
-use Milkyway\SS\Config;
-use \Milkyway\SS\InfoBoxes\Wunderlist\Contracts\Provider as Contract;
+use Milkyway\SS\InfoBoxes\Wunderlist\Contracts\Provider as Contract;
 use Exception;
 
 
@@ -134,12 +133,12 @@ class Provider implements \Flushable, Contract {
         if($this->token && !$this->tokenChecked)
             return $this->token;
 
-        $token = $this->tokenChecked ? null : Config::get('wunderlist.token');
+        $token = $this->tokenChecked ? null : singleton('env')->get('wunderlist.token');
 
         if(!$token && file_exists($this->tokenLocation()))
             $token = file_get_contents($this->tokenLocation());
 
-        if(!$token && ($email = Config::get('wunderlist.email')) && ($password = Config::get('wunderlist.password'))) {
+        if(!$token && ($email = singleton('env')->get('wunderlist.email')) && ($password = singleton('env')->get('wunderlist.password'))) {
             $response = $this->http()->post(
                 'login',
                 [

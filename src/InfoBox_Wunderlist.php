@@ -9,7 +9,6 @@
  */
 
 use Milkyway\SS\InfoBoxes\Wunderlist\Contracts\Provider as ProviderContract;
-use Milkyway\SS\Config;
 use Exception;
 
 class InfoBox_Wunderlist implements \InfoBox {
@@ -59,8 +58,8 @@ class InfoBox_Wunderlist implements \InfoBox {
         if($this->listId)
             return $this->listId;
 
-        $listId = Config::get('infoboxes_wunderlist.list_id');
-        $listTitle = Config::get('infoboxes_wunderlist.list');
+        $listId = singleton('env')->get('infoboxes_wunderlist.list_id');
+        $listTitle = singleton('env')->get('infoboxes_wunderlist.list');
 
         if(!$listId && $listTitle && file_exists($this->listLocation())) {
             $list = file_get_contents($this->listLocation());
