@@ -14,10 +14,13 @@ Add the following to your composer.json file
 ```
 
 ## License 
-* MIT
+- MIT
 
 ## Version 
-* Version 0.1 - Alpha
+- Version 0.2 (Alpha)
+
+## TODO
+- Retrieve an access token (currently you have to add it in yourself)
 
 ## Contact
 #### Milkyway Multimedia

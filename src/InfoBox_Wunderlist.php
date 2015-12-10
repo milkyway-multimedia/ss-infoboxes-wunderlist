@@ -11,41 +11,50 @@
 use Milkyway\SS\InfoBoxes\Wunderlist\Contracts\Provider as ProviderContract;
 use Exception;
 
-class InfoBox_Wunderlist implements \InfoBox {
+class InfoBox_Wunderlist implements \InfoBox
+{
     protected $provider;
     protected $listId;
     protected $task;
 
-    public function __construct(ProviderContract $provider, $listId = '') {
+    public function __construct(ProviderContract $provider, $listId = '')
+    {
         $this->provider = $provider;
         $this->listId = $listId;
     }
 
-    public function show() {
-        return $this->task() && count($this->task());
+    public function show()
+    {
+        return $this->task() && !empty($this->task());
     }
 
-    public function message() {
+    public function message()
+    {
         return $this->task()['title'];
     }
 
-    public function severity() {
+    public function severity()
+    {
         return isset($this->task()['starred']) && $this->task()['starred'] ? 1 : 2;
     }
 
-    public function link() {
+    public function link()
+    {
         return false;
     }
 
-    protected function task() {
-        if($this->task === null) {
+    protected function task()
+    {
+        if ($this->task === null) {
             try {
                 $listId = $this->getListId();
-                $tasks = array_filter($this->provider->get('me/tasks'), function($task) use($listId) {
+                $tasks = array_filter($this->provider->get('tasks', [
+                    'list_id' => $listId,
+                ]), function ($task) use ($listId) {
                     return $this->isTaskValid($task, $listId);
                 });
 
-                $this->task = count($tasks) ? array_shift($tasks) : [];
+                $this->task = !empty($tasks) ? array_shift($tasks) : [];
             } catch (Exception $e) {
                 $this->task = [];
             }
@@ -54,29 +63,32 @@ class InfoBox_Wunderlist implements \InfoBox {
         return $this->task;
     }
 
-    protected function getListId() {
-        if($this->listId)
+    protected function getListId()
+    {
+        if ($this->listId) {
             return $this->listId;
+        }
 
-        $listId = singleton('env')->get('infoboxes_wunderlist.list_id');
-        $listTitle = singleton('env')->get('infoboxes_wunderlist.list');
+        $listId = singleton('env')->get('infoboxes.wunderlist.list_id');
+        $listTitle = singleton('env')->get('infoboxes.wunderlist.list');
 
-        if(!$listId && $listTitle && file_exists($this->listLocation())) {
-            $list = file_get_contents($this->listLocation());
+        if (!$listId && $listTitle && file_exists($this->listLocation())) {
+            $list = json_decode(file_get_contents($this->listLocation()), true);
             $listId = $list['id'];
         }
 
-        if(!$listId && $listTitle) {
-            $lists = array_filter($this->provider->get('me/lists'), function($list) use($listTitle) {
-                return isset($list['title']) && $list['title'] == $listTitle && isset($list['id']);
+        if (!$listId && $listTitle) {
+            $lists = array_filter($this->provider->get('lists'), function ($list) use ($listTitle) {
+                return isset($list['title']) && strtolower($list['title']) == strtolower($listTitle) && isset($list['id']);
             });
 
-            if(!count($lists))
+            if (empty($lists)) {
                 throw new Exception(sprintf('No list could be found with the title: %s', $listTitle));
+            }
 
             $list = array_shift($lists);
 
-            file_put_contents($this->listLocation(), $list);
+            file_put_contents($this->listLocation(), json_encode($list));
             $listId = $list['id'];
         }
 
@@ -85,22 +97,27 @@ class InfoBox_Wunderlist implements \InfoBox {
         return $listId;
     }
 
-    protected function isTaskValid(array $task, $listId = '') {
-        if($listId && isset($task['list_id']) && $task['list_id'] != $listId)
+    protected function isTaskValid(array $task, $listId = '')
+    {
+        if ($listId && isset($task['list_id']) && $task['list_id'] != $listId) {
             return false;
+        }
 
-        if(!isset($task['title']) || !$task['title'])
+        if (!isset($task['title']) || !$task['title']) {
             return false;
+        }
 
-        foreach(['completed_at', 'deleted_at'] as $doneDate) {
-            if(isset($task[$doneDate]) && $task[$doneDate])
+        foreach (['completed_at', 'deleted_at'] as $doneDate) {
+            if (isset($task[$doneDate]) && $task[$doneDate]) {
                 return false;
+            }
         }
 
         return true;
     }
 
-    private function listLocation() {
+    private function listLocation()
+    {
         return TEMP_FOLDER . DIRECTORY_SEPARATOR . '.' . str_replace('\\', '_', get_class($this)) . '_list';
     }
 } 
